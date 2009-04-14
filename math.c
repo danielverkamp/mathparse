@@ -108,7 +108,6 @@ static tok get_word(const char **s)
 static void get_token(parse_ctx *ctx)
 {
 	char c;
-	tok t;
 
 	ctx->t.type = T_NONE;
 
@@ -134,7 +133,7 @@ static void get_token(parse_ctx *ctx)
 			case '^': ctx->t.type = T_POW; break;
 			}
 		}
-	} while (c && ctx->t.type == T_NONE);
+	} while (ctx->t.type == T_NONE && c);
 }
 
 static double expr(parse_ctx *ctx);
