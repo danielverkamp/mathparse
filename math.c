@@ -32,20 +32,20 @@ typedef struct {
 	char *str;
 } tok;
 
-tok t;
+static tok t;
 
 typedef struct {
 	const char *name;
 	double val;
 } constant;
 
-const constant consts[] = {
+static const constant consts[] = {
 	{ "e",  2.71828182845904523536 },
 	{ "pi", 3.14159265358979323846 },
 	{ NULL }
 };
 
-const constant *find_const(char *name)
+static const constant *find_const(char *name)
 {
 	const constant *c;
 
@@ -56,13 +56,13 @@ const constant *find_const(char *name)
 	return NULL;
 }
 
-void err()
+static void err()
 {
 	fprintf(stderr, "parse error\n");
 	exit(1);
 }
 
-tok get_number(char **s)
+static tok get_number(char **s)
 {
 	char *end;
 	tok ret;
@@ -81,7 +81,7 @@ tok get_number(char **s)
 	return ret;
 }
 
-tok get_word(char **s)
+static tok get_word(char **s)
 {
 	char *end;
 	tok ret;
@@ -102,7 +102,7 @@ tok get_word(char **s)
 	return ret;
 }
 
-tok get_token(char **s)
+static tok get_token(char **s)
 {
 	char c;
 	tok t;
@@ -137,9 +137,9 @@ tok get_token(char **s)
 	return t;
 }
 
-double expr(char **s);
+static double expr(char **s);
 
-double power(char **s)
+static double power(char **s)
 {
 	double ret;
 
@@ -167,7 +167,7 @@ double power(char **s)
 	}
 }
 
-double factor(char **s)
+static double factor(char **s)
 {
 	double ret;
 
@@ -181,7 +181,7 @@ double factor(char **s)
 	return ret;
 }
 
-double term(char **s)
+static double term(char **s)
 {
 	double ret;
 	int op;
@@ -200,7 +200,7 @@ double term(char **s)
 	return ret;
 }
 
-double expr(char **s)
+static double expr(char **s)
 {
 	double ret;
 
