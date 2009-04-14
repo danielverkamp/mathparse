@@ -57,6 +57,7 @@ typedef struct {
 static const funct functs[] = {
 	{ "sin", sin },
 	{ "cos", cos },
+	{ "tan", tan },
 	{ NULL }
 };
 
