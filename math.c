@@ -26,6 +26,7 @@ unary -> power
 power -> num
 power -> const
 power -> ( expr )
+power -> funct ( expr )
 
 */
 
@@ -49,17 +50,39 @@ static const constant consts[] = {
 };
 
 typedef struct {
+	const char *name;
+	double (*funct)(double);
+} funct;
+
+static const funct functs[] = {
+	{ "sin", sin },
+	{ "cos", cos },
+	{ NULL }
+};
+
+typedef struct {
 	tok t;
 	const char **s;
 } parse_ctx;
 
-static const constant *find_const(char *name)
+static const constant *find_const(const char *name)
 {
 	const constant *c;
 
 	for (c = consts; c->name; c++)
 		if (!strcasecmp(c->name, name))
 			return c;
+
+	return NULL;
+}
+
+static const funct *find_funct(const char *name)
+{
+	const funct *f;
+
+	for (f = functs; f->name; f++)
+		if (!strcasecmp(f->name, name))
+			return f;
 
 	return NULL;
 }
@@ -154,11 +177,18 @@ static double power(parse_ctx *ctx)
 	case T_WORD:
 	{
 		const constant *c = find_const(ctx->t.str);
+		const funct *f = NULL;
 		if (!c) {
-			err();
-			return 0.0;
+			f = find_funct(ctx->t.str);
+			if (!f) {
+				err();
+				return 0.0;
+			}
+			get_token(ctx);
+			ret = f->funct(expr(ctx));
+		} else {
+			ret = c->val;
 		}
-		ret = c->val;
 		get_token(ctx);
 		return ret;
 	}
