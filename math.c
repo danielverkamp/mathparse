@@ -197,7 +197,13 @@ static double power(parse_ctx *ctx)
 	case T_LPAREN:
 		get_token(ctx);
 		ret = expr(ctx);
-		get_token(ctx); // )
+		fprintf(stderr, "after expr, t.type = %d\n", ctx->t.type);
+		/*
+		if (ctx->t.type != T_RPAREN) {
+			err();
+			return 0.0;
+		}*/
+		get_token(ctx);
 		return ret;
 	default:
 		err();
@@ -256,17 +262,20 @@ static double term(parse_ctx *ctx)
 static double expr(parse_ctx *ctx)
 {
 	double ret;
+	int op;
 
 	ret = term(ctx);
 
 	while (ctx->t.type == T_PLUS || ctx->t.type == T_MINUS) {
-		switch (ctx->t.type) {
+		op = ctx->t.type;
+		get_token(ctx);
+		switch (op) {
 		case T_PLUS:
-			get_token(ctx);
 			ret += term(ctx);
+			break;
 		case T_MINUS:
-			get_token(ctx);
 			ret -= term(ctx);
+			break;
 		}
 	}
 
