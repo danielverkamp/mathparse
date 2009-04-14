@@ -32,8 +32,6 @@ typedef struct {
 	char *str;
 } tok;
 
-static tok t;
-
 typedef struct {
 	const char *name;
 	double val;
@@ -44,6 +42,11 @@ static const constant consts[] = {
 	{ "pi", 3.14159265358979323846 },
 	{ NULL }
 };
+
+typedef struct {
+	tok t;
+	const char **s;
+} parse_ctx;
 
 static const constant *find_const(char *name)
 {
@@ -62,9 +65,9 @@ static void err()
 	exit(1);
 }
 
-static tok get_number(char **s)
+static tok get_number(const char **s)
 {
-	char *end;
+	const char *end;
 	tok ret;
 
 	ret.type = T_NONE;
@@ -81,9 +84,9 @@ static tok get_number(char **s)
 	return ret;
 }
 
-static tok get_word(char **s)
+static tok get_word(const char **s)
 {
-	char *end;
+	const char *end;
 	tok ret;
 
 	ret.type = T_NONE;
@@ -102,64 +105,61 @@ static tok get_word(char **s)
 	return ret;
 }
 
-static tok get_token(char **s)
+static void get_token(parse_ctx *ctx)
 {
 	char c;
 	tok t;
 
-	t.type = T_NONE;
+	ctx->t.type = T_NONE;
 
 	do {
-		t = get_number(s);
+		ctx->t = get_number(ctx->s);
 
-		if (t.type == T_NONE) {
-			t = get_word(s);
+		if (ctx->t.type == T_NONE) {
+			ctx->t = get_word(ctx->s);
 		}
 
-		if (t.type == T_NONE) {
-			c = **s;
-			(*s)++;
+		if (ctx->t.type == T_NONE) {
+			c = **ctx->s;
+			(*ctx->s)++;
 
 			switch (c) {
-			case 0: t.type = T_EOF; break;
-			case '+': t.type = T_PLUS; break;
-			case '-': t.type = T_MINUS; break;
-			case '*': t.type = T_MUL; break;
-			case '/': t.type = T_DIV; break;
-			case '(': t.type = T_LPAREN; break;
-			case ')': t.type = T_RPAREN; break;
-			case '^': t.type = T_POW; break;
+			case 0:   ctx->t.type = T_EOF; break;
+			case '+': ctx->t.type = T_PLUS; break;
+			case '-': ctx->t.type = T_MINUS; break;
+			case '*': ctx->t.type = T_MUL; break;
+			case '/': ctx->t.type = T_DIV; break;
+			case '(': ctx->t.type = T_LPAREN; break;
+			case ')': ctx->t.type = T_RPAREN; break;
+			case '^': ctx->t.type = T_POW; break;
 			}
 		}
-
-		if (t.type != T_NONE) break;
-	} while (c);
-	return t;
+	} while (c && ctx->t.type == T_NONE);
 }
 
-static double expr(char **s);
+static double expr(parse_ctx *ctx);
 
-static double power(char **s)
+static double power(parse_ctx *ctx)
 {
 	double ret;
 
-	switch (t.type) {
+	switch (ctx->t.type) {
 	case T_NUM:
-		ret = t.val;
-		t = get_token(s);
+		ret = ctx->t.val;
+		get_token(ctx);
 		return ret;
 	case T_WORD:
 	{
-		const constant *c = find_const(t.str);
+		const constant *c = find_const(ctx->t.str);
 		if (!c) err();
 		ret = c->val;
-		t = get_token(s);
+		get_token(ctx);
 		return ret;
 	}
 	case T_LPAREN:
-		t = get_token(s);
-		ret = expr(s);
-		t = get_token(s); // )
+		get_token(ctx);
+		ret = expr(ctx);
+		get_token(ctx); // )
 		return ret;
 	default:
 		err();
@@ -167,60 +167,62 @@ static double power(char **s)
 	}
 }
 
-static double factor(char **s)
+static double factor(parse_ctx *ctx)
 {
 	double ret;
 
-	ret = power(s);
+	ret = power(ctx);
 
-	while (t.type == T_POW) {
-		t = get_token(s);
-		ret = pow(ret, power(s));
+	while (ctx->t.type == T_POW) {
+		get_token(ctx);
+		ret = pow(ret, power(ctx));
 	}
 
 	return ret;
 }
 
-static double term(char **s)
+static double term(parse_ctx *ctx)
 {
 	double ret;
 	int op;
 
-	ret = factor(s);
+	ret = factor(ctx);
 
-	while (t.type == T_MUL || t.type == T_DIV) {
-		op = t.type;
-		t = get_token(s);
+	while (ctx->t.type == T_MUL || ctx->t.type == T_DIV) {
+		op = ctx->t.type;
+		get_token(ctx);
 		if (op == T_MUL)
-			ret *= factor(s);
+			ret *= factor(ctx);
 		else if (op == T_DIV)
-			ret /= factor(s);
+			ret /= factor(ctx);
 	}
 
 	return ret;
 }
 
-static double expr(char **s)
+static double expr(parse_ctx *ctx)
 {
 	double ret;
 
-	ret = term(s);
+	ret = term(ctx);
 
-	while (t.type == T_PLUS || t.type == T_MINUS) {
-		switch (t.type) {
+	while (ctx->t.type == T_PLUS || ctx->t.type == T_MINUS) {
+		switch (ctx->t.type) {
 		case T_PLUS:
-			t = get_token(s);
-			ret += term(s);
+			get_token(ctx);
+			ret += term(ctx);
 		}
 	}
 
 	return ret;
 }
 
-double parse(char *s)
+double parse(const char *s)
 {
-	t = get_token(&s);
-	return expr(&s);
+	parse_ctx ctx;
+	ctx.s = &s;
+	get_token(&ctx);
+	return expr(&ctx);
 }
 
 int main(int argc, char **argv)
