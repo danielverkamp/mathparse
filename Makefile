@@ -17,5 +17,6 @@ math$(EXEEXT): $(OBJS) main.c mathparse.h
 	$(CC) $(OBJS) main.c -o $@ -lm $(CFLAGS) $(LDFLAGS)
 
 clean:
+	rm -f $(OBJS)
 	rm -f math$(EXEEXT)
 
