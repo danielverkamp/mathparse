@@ -68,7 +68,7 @@ static const funct functs[] = {
 	{ "asinh", asinh },
 	{ "atanh", atanh },
 	{ "exp", exp },
-	{ "log", log },
+	{ "ln", log },
 	{ "sqrt", sqrt },
 	{ "cbrt", cbrt },
 	{ "ceil", ceil },
