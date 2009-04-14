@@ -55,10 +55,31 @@ typedef struct {
 } funct;
 
 static const funct functs[] = {
-	{ "sin", sin },
+	{ "acos", acos },
+	{ "asin", asin },
+	{ "atan", atan },
 	{ "cos", cos },
+	{ "sin", sin },
 	{ "tan", tan },
-	{ "sqrt", sqrt},
+	{ "cosh", cosh },
+	{ "sinh", sinh },
+	{ "tanh", tanh },
+	{ "acosh", acosh },
+	{ "asinh", asinh },
+	{ "atanh", atanh },
+	{ "exp", exp },
+	{ "log", log },
+	{ "sqrt", sqrt },
+	{ "cbrt", cbrt },
+	{ "ceil", ceil },
+	{ "abs", fabs },
+	{ "floor", floor },
+	{ "significand", significand },
+	{ "erf", erf },
+	{ "erfc", erfc },
+	{ "lgamma", lgamma },
+	{ "gamma", gamma },
+	{ "rint", rint },
 	{ NULL }
 };
 
