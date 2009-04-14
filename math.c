@@ -18,6 +18,7 @@ term -> factor / factor
 term -> factor
 
 factor -> - unary
+factor -> unary !
 factor -> unary
 
 unary -> power ^ power
@@ -30,7 +31,7 @@ power -> funct ( expr )
 
 */
 
-enum { T_NONE, T_EOF, T_PLUS, T_MINUS, T_MUL, T_DIV, T_LPAREN, T_RPAREN, T_NUM, T_POW, T_WORD };
+enum { T_NONE, T_EOF, T_PLUS, T_MINUS, T_MUL, T_DIV, T_LPAREN, T_RPAREN, T_NUM, T_POW, T_WORD, T_BANG };
 
 typedef struct {
 	int type;
@@ -181,9 +182,16 @@ static void get_token(parse_ctx *ctx)
 			case '(': ctx->t.type = T_LPAREN; break;
 			case ')': ctx->t.type = T_RPAREN; break;
 			case '^': ctx->t.type = T_POW; break;
+			case '!': ctx->t.type = T_BANG; break;
 			}
 		}
 	} while (ctx->t.type == T_NONE && c);
+}
+
+static double factorial(double x)
+{
+	if (x <= 0.0) return 1.0;
+	return x * factorial(x - 1.0);
 }
 
 static double expr(parse_ctx *ctx);
@@ -252,6 +260,11 @@ static double factor(parse_ctx *ctx)
 	}
 
 	ret = sign * unary(ctx);
+
+	while (ctx->t.type == T_BANG) {
+		get_token(ctx);
+		ret = factorial(floor(ret));
+	}
 
 	return ret;
 }
