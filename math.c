@@ -186,7 +186,7 @@ double term(char **s)
 	double ret;
 	int op;
 
-	ret = power(s);
+	ret = factor(s);
 
 	while (t.type == T_MUL || t.type == T_DIV) {
 		op = t.type;
