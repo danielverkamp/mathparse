@@ -263,14 +263,10 @@ static double expr(parse_ctx *ctx)
 	while (ctx->t.type == T_PLUS || ctx->t.type == T_MINUS) {
 		op = ctx->t.type;
 		get_token(ctx);
-		switch (op) {
-		case T_PLUS:
+		if (op == T_PLUS)
 			ret += term(ctx);
-			break;
-		case T_MINUS:
+		else if (op == T_MINUS)
 			ret -= term(ctx);
-			break;
-		}
 	}
 
 	return ret;
