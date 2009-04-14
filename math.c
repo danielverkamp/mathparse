@@ -207,6 +207,7 @@ static double power(parse_ctx *ctx)
 				err();
 				return 0.0;
 			}
+			get_token(ctx); // (
 			get_token(ctx);
 			ret = f->funct(expr(ctx));
 		} else {
