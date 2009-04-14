@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <strings.h>
+#include <string.h>
 
 /*
 syntax:
@@ -16,16 +18,43 @@ term -> factor
 factor -> power ^ power
 factor -> power
 
+power -> num
+power -> const
+power -> ( expr )
+
 */
 
-enum { T_NONE, T_EOF, T_PLUS, T_MINUS, T_MUL, T_DIV, T_LPAREN, T_RPAREN, T_NUM, T_POW };
+enum { T_NONE, T_EOF, T_PLUS, T_MINUS, T_MUL, T_DIV, T_LPAREN, T_RPAREN, T_NUM, T_POW, T_WORD };
 
 typedef struct {
 	int type;
 	double val;
+	char *str;
 } tok;
 
 tok t;
+
+typedef struct {
+	const char *name;
+	double val;
+} constant;
+
+const constant consts[] = {
+	{ "e",  2.71828182845904523536 },
+	{ "pi", 3.14159265358979323846 },
+	{ NULL }
+};
+
+const constant *find_const(char *name)
+{
+	const constant *c;
+
+	for (c = consts; c->name; c++)
+		if (!strcasecmp(c->name, name))
+			return c;
+
+	return NULL;
+}
 
 void err()
 {
@@ -52,6 +81,27 @@ tok get_number(char **s)
 	return ret;
 }
 
+tok get_word(char **s)
+{
+	char *end;
+	tok ret;
+
+	ret.type = T_NONE;
+	for (end = *s; (*end >= 'A' && *end <= 'Z') || (*end >= 'a' && *end <= 'z'); end++)
+		;
+
+	if (end != *s) {
+		int len = end - *s;
+		ret.type = T_WORD;
+		ret.str = malloc(len + 1);
+		memcpy(ret.str, *s, len);
+		ret.str[len] = '\0';
+		*s = end;
+	}
+
+	return ret;
+}
+
 tok get_token(char **s)
 {
 	char c;
@@ -61,6 +111,10 @@ tok get_token(char **s)
 
 	do {
 		t = get_number(s);
+
+		if (t.type == T_NONE) {
+			t = get_word(s);
+		}
 
 		if (t.type == T_NONE) {
 			c = **s;
@@ -94,6 +148,14 @@ double power(char **s)
 		ret = t.val;
 		t = get_token(s);
 		return ret;
+	case T_WORD:
+	{
+		const constant *c = find_const(t.str);
+		if (!c) err();
+		ret = c->val;
+		t = get_token(s);
+		return ret;
+	}
 	case T_LPAREN:
 		t = get_token(s);
 		ret = expr(s);
