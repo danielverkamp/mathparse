@@ -67,7 +67,6 @@ static const constant *find_const(char *name)
 static void err()
 {
 	fprintf(stderr, "parse error\n");
-	exit(1);
 }
 
 static tok get_number(const char **s)
@@ -155,7 +154,10 @@ static double power(parse_ctx *ctx)
 	case T_WORD:
 	{
 		const constant *c = find_const(ctx->t.str);
-		if (!c) err();
+		if (!c) {
+			err();
+			return 0.0;
+		}
 		ret = c->val;
 		get_token(ctx);
 		return ret;
