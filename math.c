@@ -39,10 +39,13 @@ tok get_number(char **s)
 	tok ret;
 
 	ret.type = T_NONE;
-	ret.val = strtod(*s, &end);
+
+	for (end = *s; (*end >= '0' && *end <= '9') || (*end == '.'); end++)
+		;
 
 	if (end != *s) {
 		ret.type = T_NUM;
+		ret.val = atof(*s);
 		*s = end;
 	}
 
