@@ -4,6 +4,8 @@
 #include <strings.h>
 #include <string.h>
 
+#include "mathparse.h"
+
 /*
 syntax:
 
