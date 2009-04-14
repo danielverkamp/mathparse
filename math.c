@@ -58,6 +58,7 @@ static const funct functs[] = {
 	{ "sin", sin },
 	{ "cos", cos },
 	{ "tan", tan },
+	{ "sqrt", sqrt},
 	{ NULL }
 };
 
