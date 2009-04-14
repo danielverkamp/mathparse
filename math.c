@@ -262,6 +262,9 @@ static double expr(parse_ctx *ctx)
 		case T_PLUS:
 			get_token(ctx);
 			ret += term(ctx);
+		case T_MINUS:
+			get_token(ctx);
+			ret -= term(ctx);
 		}
 	}
 
