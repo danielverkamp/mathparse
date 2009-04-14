@@ -243,14 +243,3 @@ double parse(const char *s)
 	get_token(&ctx);
 	return expr(&ctx);
 }
-
-int main(int argc, char **argv)
-{
-	int i;
-	double ret;
-	for (i = 0; i < 100000; i++) {
-		ret = parse(argv[1]);
-	}
-	printf("%.5f\n", ret);
-	return 0;
-}
