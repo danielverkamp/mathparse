@@ -17,8 +17,11 @@ term -> factor * factor
 term -> factor / factor
 term -> factor
 
-factor -> power ^ power
-factor -> power
+factor -> - unary
+factor -> unary
+
+unary -> power ^ power
+unary -> power
 
 power -> num
 power -> const
@@ -168,7 +171,7 @@ static double power(parse_ctx *ctx)
 	}
 }
 
-static double factor(parse_ctx *ctx)
+static double unary(parse_ctx *ctx)
 {
 	double ret;
 
@@ -178,6 +181,21 @@ static double factor(parse_ctx *ctx)
 		get_token(ctx);
 		ret = pow(ret, power(ctx));
 	}
+
+	return ret;
+}
+
+static double factor(parse_ctx *ctx)
+{
+	double ret;
+	int sign = 1;
+
+	while (ctx->t.type == T_MINUS) {
+		get_token(ctx);
+		sign = -sign;
+	}
+
+	ret = sign * unary(ctx);
 
 	return ret;
 }
