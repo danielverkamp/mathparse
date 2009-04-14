@@ -1,11 +1,18 @@
 EXEEXT :=
+OBJS := math.o
 
 default: all
 
-all: math$(EXEEXT)
+all: math$(EXEEXT) libmathparse.a
 
-math$(EXEEXT): math.c mathparse.h
-	$(CC) $< -o $@ -lm -O3 -Wall
+%.o: %.c
+	$(CC) -c $< -o $@ -O3 -Wall
+
+libmathparse.a: $(OBJS)
+	ar rsc $@ $(OBJS)
+
+math$(EXEEXT): $(OBJS) mathparse.h
+	$(CC) $(OBJS) -o $@ -lm -O3 -Wall
 
 clean:
 	rm -f math$(EXEEXT)
