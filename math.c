@@ -197,12 +197,6 @@ static double power(parse_ctx *ctx)
 	case T_LPAREN:
 		get_token(ctx);
 		ret = expr(ctx);
-		fprintf(stderr, "after expr, t.type = %d\n", ctx->t.type);
-		/*
-		if (ctx->t.type != T_RPAREN) {
-			err();
-			return 0.0;
-		}*/
 		get_token(ctx);
 		return ret;
 	default:
