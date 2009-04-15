@@ -161,6 +161,10 @@ static void get_token(parse_ctx *ctx)
 	char c;
 
 	ctx->t.type = T_NONE;
+	if (ctx->t.str) {
+		free(ctx->t.str);
+		ctx->t.str = NULL;
+	}
 
 	do {
 		ctx->t = get_number(ctx->s);
@@ -311,6 +315,7 @@ static double expr(parse_ctx *ctx)
 double parse(const char *s)
 {
 	parse_ctx ctx;
+	ctx.t.str = NULL;
 	ctx.s = &s;
 	get_token(&ctx);
 	return expr(&ctx);
