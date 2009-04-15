@@ -160,11 +160,12 @@ static void get_token(parse_ctx *ctx)
 {
 	char c;
 
-	ctx->t.type = T_NONE;
-	if (ctx->t.str) {
+	if (ctx->t.type == T_WORD) {
 		free(ctx->t.str);
 		ctx->t.str = NULL;
 	}
+
+	ctx->t.type = T_NONE;
 
 	do {
 		ctx->t = get_number(ctx->s);
