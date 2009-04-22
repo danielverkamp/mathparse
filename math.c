@@ -55,6 +55,11 @@ typedef struct {
 	double (*funct)(double);
 } funct;
 
+static double rand_dbl(double max)
+{
+	return (double)rand() * max / (double)RAND_MAX;
+}
+
 static const funct functs[] = {
 	{ "acos", acos },
 	{ "asin", asin },
@@ -81,6 +86,7 @@ static const funct functs[] = {
 	{ "lgamma", lgamma },
 	{ "gamma", gamma },
 	{ "rint", rint },
+	{ "rand", rand_dbl },
 	{ NULL }
 };
 
