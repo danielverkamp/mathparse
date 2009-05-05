@@ -201,7 +201,7 @@ static tok get_number_dec(const char **s)
 	const char *end;
 	tok ret;
 	char *num;
-	int dot_count = 0, e_count = 0, neg_count = 0;
+	int dot_count = 0, e_count = 0, neg_count = 0, plus_count = 0;
 
 	ret.type = T_NONE;
 
@@ -222,7 +222,15 @@ static tok get_number_dec(const char **s)
 				goto done;
 			if (end == *s)
 				goto done;
-			if (neg_count++)
+			if (plus_count || neg_count++)
+				goto done;
+			break;
+		case '+':
+			if (!e_count)
+				goto done;
+			if (end == *s)
+				goto done;
+			if (neg_count || plus_count++)
 				goto done;
 			break;
 		default:
