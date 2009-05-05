@@ -15,6 +15,7 @@ expr -> term
 
 term -> factor * factor
 term -> factor / factor
+term -> factor % factor
 term -> factor
 
 factor -> - unary
@@ -32,7 +33,7 @@ power -> funct ( expr )
 
 */
 
-enum { T_NONE, T_EOF, T_PLUS, T_MINUS, T_MUL, T_DIV, T_LPAREN, T_RPAREN, T_NUM, T_POW, T_WORD, T_BANG };
+enum { T_NONE, T_EOF, T_PLUS, T_MINUS, T_MUL, T_DIV, T_LPAREN, T_RPAREN, T_NUM, T_POW, T_WORD, T_BANG, T_MOD };
 
 typedef struct {
 	int type;
@@ -332,6 +333,7 @@ static void get_token(parse_ctx *ctx)
 			case ')': ctx->t.type = T_RPAREN; break;
 			case '^': ctx->t.type = T_POW; break;
 			case '!': ctx->t.type = T_BANG; break;
+			case '%': ctx->t.type = T_MOD; break;
 			}
 		}
 	} while (ctx->t.type == T_NONE && c);
@@ -428,13 +430,15 @@ static double term(parse_ctx *ctx)
 
 	ret = factor(ctx);
 
-	while (ctx->t.type == T_MUL || ctx->t.type == T_DIV) {
+	while (ctx->t.type == T_MUL || ctx->t.type == T_DIV || ctx->t.type == T_MOD) {
 		op = ctx->t.type;
 		get_token(ctx);
 		if (op == T_MUL)
 			ret *= factor(ctx);
 		else if (op == T_DIV)
 			ret /= factor(ctx);
+		else if (op == T_MOD)
+			ret = (double)((long long)ret % (long long)factor(ctx));
 	}
 
 	return ret;
