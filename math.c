@@ -307,7 +307,7 @@ static void get_token(parse_ctx *ctx)
 
 static double factorial(double x)
 {
-	if (x > 170.0) return 0.0;
+	if (x > 170.0) return 1.0/0.0;
 	if (x <= 0.0) return 1.0;
 	return x * factorial(x - 1.0);
 }
