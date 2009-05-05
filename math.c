@@ -122,21 +122,127 @@ static void err()
 	fprintf(stderr, "parse error\n");
 }
 
-static tok get_number(const char **s)
+static tok get_number_oct(const char **s)
 {
 	const char *end;
 	tok ret;
 
 	ret.type = T_NONE;
+	ret.val = 0.0;
 
-	for (end = *s; (*end >= '0' && *end <= '9') || (*end == '.'); end++)
+	if ((*s)[0] != '0' || (*s)[1] != 'o')
+		return ret;
+
+	for (end = *s + 2; *end >= '0' && *end <= '7'; end++)
+		ret.val = ret.val * 8.0 + (*end - '0');
+
+	if (end != *s + 2) {
+		ret.type = T_NUM;
+		*s = end;
+	}
+
+	return ret;
+}
+
+static tok get_number_hex(const char **s)
+{
+	const char *end;
+	tok ret;
+
+	ret.type = T_NONE;
+	ret.val = 0.0;
+
+	if ((*s)[0] != '0' || (*s)[1] != 'x')
+		return ret;
+
+	for (end = *s + 2; ; end++) {
+		if (*end >= '0' && *end <= '9')
+			ret.val = ret.val * 16.0 + (*end - '0');
+		else if (*end >= 'A' && *end <= 'F')
+			ret.val = ret.val * 16.0 + (*end - 'A') + 10.0;
+		else if (*end >= 'a' && *end <= 'f')
+			ret.val = ret.val * 16.0 + (*end - 'a') + 10.0;
+		else
+			break;
+	}
+
+	if (end != *s + 2) {
+		ret.type = T_NUM;
+		*s = end;
+	}
+
+	return ret;
+}
+
+static tok get_number_bin(const char **s)
+{
+	const char *end;
+	tok ret;
+
+	ret.type = T_NONE;
+	ret.val = 0.0;
+
+	if ((*s)[0] != '0' || (*s)[1] != 'b')
+		return ret;
+
+	for (end = *s + 2; *end == '0' || *end == '1'; end++)
+		ret.val = ret.val * 2.0 + (*end - '0');
+
+	if (end != *s + 2) {
+		ret.type = T_NUM;
+		*s = end;
+	}
+
+	return ret;
+}
+
+static tok get_number_dec(const char **s)
+{
+	const char *end;
+	tok ret;
+	char *num;
+	int dot_count = 0, e_count = 0;
+
+	ret.type = T_NONE;
+
+	for (end = *s; (*end >= '0' && *end <= '9') || (*end == '.' && !dot_count++) || (*end == 'e' && !e_count++); end++)
 		;
 
 	if (end != *s) {
+		int len = end - *s;
+        num = alloca(len + 1);
+        memcpy(num, *s, len);
+        num[len] = 0;
 		ret.type = T_NUM;
-		ret.val = atof(*s);
+		ret.val = atof(num);
 		*s = end;
 	}
+
+	return ret;
+}
+
+static tok get_number(const char **s)
+{
+	tok ret;
+
+	ret.type = T_NONE;
+
+	ret = get_number_oct(s);
+	if (ret.type != T_NONE)
+		return ret;
+
+	ret = get_number_hex(s);
+	if (ret.type != T_NONE)
+		return ret;
+
+	ret = get_number_bin(s);
+	if (ret.type != T_NONE)
+		return ret;
+
+	ret = get_number_dec(s);
+	if (ret.type != T_NONE)
+		return ret;
+
 
 	return ret;
 }
