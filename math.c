@@ -201,12 +201,35 @@ static tok get_number_dec(const char **s)
 	const char *end;
 	tok ret;
 	char *num;
-	int dot_count = 0, e_count = 0;
+	int dot_count = 0, e_count = 0, neg_count = 0;
 
 	ret.type = T_NONE;
 
-	for (end = *s; (*end >= '0' && *end <= '9') || (*end == '.' && !dot_count++) || (*end == 'e' && !e_count++); end++)
-		;
+	for (end = *s; ; end++) {
+		switch (*end) {
+		case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+			break;
+		case '.':
+			if (dot_count++)
+				goto done;
+			break;
+		case 'e': case 'E': case 'd':
+			if (e_count++)
+				goto done;
+			break;
+		case '-':
+			if (!e_count)
+				goto done;
+			if (end == *s)
+				goto done;
+			if (neg_count++)
+				goto done;
+			break;
+		default:
+			goto done;
+		}
+	}
+done:
 
 	if (end != *s) {
 		int len = end - *s;

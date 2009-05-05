@@ -9,7 +9,7 @@ int main(int argc, char **argv)
 	double ret;
 	srand(time(0));
 	ret = parse(argv[1]);
-	printf("%.5f\n", ret);
+	printf("%f\n", ret);
 	return 0;
 }
 
