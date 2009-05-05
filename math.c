@@ -18,6 +18,7 @@ term -> factor / factor
 term -> factor
 
 factor -> - unary
+factor -> + unary
 factor -> unary !
 factor -> unary
 
@@ -403,9 +404,11 @@ static double factor(parse_ctx *ctx)
 	double ret;
 	int sign = 1;
 
-	while (ctx->t.type == T_MINUS) {
+	while (ctx->t.type == T_MINUS || ctx->t.type == T_PLUS) {
+		if (ctx->t.type == T_MINUS)
+			sign = -sign;
 		get_token(ctx);
-		sign = -sign;
+		
 	}
 
 	ret = sign * unary(ctx);
