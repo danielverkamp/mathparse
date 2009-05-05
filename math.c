@@ -49,6 +49,7 @@ typedef struct {
 static const constant consts[] = {
 	{ "e",  2.71828182845904523536 },
 	{ "pi", 3.14159265358979323846 },
+	{ "inf", 1.0/0.0               },
 	{ NULL }
 };
 
