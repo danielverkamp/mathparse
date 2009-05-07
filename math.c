@@ -3,6 +3,7 @@
 #include <math.h>
 #include <strings.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "mathparse.h"
 
@@ -24,6 +25,7 @@ factor -> unary !
 factor -> unary
 
 unary -> power ^ power
+unary -> power d power
 unary -> power
 
 power -> num
@@ -216,7 +218,7 @@ static tok get_number_dec(const char **s)
 			if (dot_count++)
 				goto done;
 			break;
-		case 'e': case 'E': case 'd':
+		case 'e': case 'E':
 			if (e_count++)
 				goto done;
 			break;
@@ -389,15 +391,38 @@ static double power(parse_ctx *ctx)
 	}
 }
 
+/* returns XdY */
+static int roll(int x, int y)
+{
+	int ret = 0, i;
+	if (x <= 0)
+		return 0;
+	if (y > RAND_MAX)
+		return -1;
+
+	for (i = 0; i < x; i++)
+		ret += (rand() % y) + 1;
+
+	return ret;
+}
+
 static double unary(parse_ctx *ctx)
 {
 	double ret;
 
 	ret = power(ctx);
 
-	while (ctx->t.type == T_POW) {
+	while (ctx->t.type == T_POW ||
+		(ctx->t.type == T_WORD &&
+		tolower(ctx->t.str[0]) == 'd' &&
+		ctx->t.str[1] == '\0'))
+	{
+		int type = ctx->t.type;
 		get_token(ctx);
-		ret = pow(ret, power(ctx));
+		if (type == T_POW)
+			ret = pow(ret, power(ctx));
+		else
+			ret = roll(ret, power(ctx));
 	}
 
 	return ret;
