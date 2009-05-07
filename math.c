@@ -395,7 +395,7 @@ static double power(parse_ctx *ctx)
 static int roll(int x, int y)
 {
 	int ret = 0, i;
-	if (x <= 0)
+	if (x <= 0 || y <= 0)
 		return 0;
 	if (y > RAND_MAX)
 		return -1;
