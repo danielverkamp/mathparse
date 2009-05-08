@@ -397,7 +397,7 @@ static int roll(int x, int y)
 	int ret = 0, i;
 	if (x <= 0 || y <= 0)
 		return 0;
-	if (y > RAND_MAX)
+	if (x > 100 || y > RAND_MAX)
 		return -1;
 
 	for (i = 0; i < x; i++)
