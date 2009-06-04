@@ -246,9 +246,9 @@ done:
 
 	if (end != *s) {
 		int len = end - *s;
-        num = alloca(len + 1);
-        memcpy(num, *s, len);
-        num[len] = 0;
+		num = alloca(len + 1);
+		memcpy(num, *s, len);
+		num[len] = 0;
 		ret.type = T_NUM;
 		ret.val = atof(num);
 		*s = end;
@@ -278,7 +278,6 @@ static tok get_number(const char **s)
 	ret = get_number_dec(s);
 	if (ret.type != T_NONE)
 		return ret;
-
 
 	return ret;
 }
