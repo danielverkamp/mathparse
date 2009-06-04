@@ -219,7 +219,7 @@ static tok get_number_dec(const char **s)
 				goto done;
 			break;
 		case 'e': case 'E':
-			if (e_count++)
+			if (end == *s || e_count++)
 				goto done;
 			break;
 		case '-':
